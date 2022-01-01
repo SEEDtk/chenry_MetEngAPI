@@ -36,7 +36,7 @@ RUN rm -rf /miniconda/lib/python3.6/site-packages/numpy
 # Running with --ignore-installed will overwrite with the correct
 # cobra version.
 RUN mkdir deps && cd deps && \
-    pip install cobrapy
+    pip install cobrapy && \
 	git clone --branch cobra-model https://github.com/Fxe/cobrakbase.git && \
     pip install cobrakbase/ --ignore-installed && \
     git clone --branch main https://github.com/cshenry/ModelSEEDpy.git && \
