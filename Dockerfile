@@ -40,7 +40,7 @@ RUN mkdir deps && cd deps && \
     git clone --branch cobra-model https://github.com/Fxe/cobrakbase.git && \
     pip install cobrakbase/ && \
     git clone --branch main https://github.com/cshenry/ModelSEEDpy.git && \
-    pip install ModelSEEDpy/ && \
+    pip install ModelSEEDpy/
     
 # -----------------------------------------
 
