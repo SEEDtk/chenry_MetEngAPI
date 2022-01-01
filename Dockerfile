@@ -6,14 +6,8 @@ MAINTAINER chenry@anl.gov
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
-# RUN apt-get update
-
-FROM ubuntu
-# ...
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && \
-    apt-get -y install gcc mono-mcs && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update
+RUN apt-get install gcc
 
 # Here we install a python coverage tool and an
 # https library that is out of date in the base image.
