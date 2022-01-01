@@ -28,6 +28,7 @@ RUN pip install cffi --upgrade \
 
 
 RUN rm -rf /miniconda/lib/python3.6/site-packages/numpy
+RUN rm -rf /miniconda/lib/python3.6/site-packages/ruamel*
     
 # Install forked version of optlang and cobrapy to add
 # additional solver support COINOR-CBC,CLP and OSQP.
