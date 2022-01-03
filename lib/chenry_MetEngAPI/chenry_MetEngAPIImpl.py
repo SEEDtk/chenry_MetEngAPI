@@ -7,7 +7,7 @@ import cobra
 #import cobrakbase
 import escher
 from escher import Builder
-from cobrakbase.core.kbase_object_factory import KBaseObjectFactory
+#from cobrakbase.core.kbase_object_factory import KBaseObjectFactory
 from modelseedpy import MSPackageManager, FBAHelper
 
 def validate_args(params,required,defaults):
@@ -55,16 +55,18 @@ class chenry_MetEngAPI:
     
     def get_media(self,media_id):
         if exists(self.config["data_dir"]+"/media/"+media_id):
-            factory = KBaseObjectFactory()
-            return factory.build_object_from_file(self.config["data_dir"]+"/media/"+media_id, 'KBaseBiochem.Media')  
+            return None
+            #factory = KBaseObjectFactory()
+            #return factory.build_object_from_file(self.config["data_dir"]+"/media/"+media_id, 'KBaseBiochem.Media')  
         elif len(media_id.split("/")) > 1:
             return self.kbase_api.get_from_ws(media_id,None)
         return None
     
     def get_model(self,model_id):
         if exists(self.config["data_dir"]+"/models/"+model_id+".kb"):
-            factory = KBaseObjectFactory()
-            return factory.build_object_from_file(self.config["data_dir"]+"/models/"+model_id, 'KBaseFBA.FBAModel')
+            return None
+            #factory = KBaseObjectFactory()
+            #return factory.build_object_from_file(self.config["data_dir"]+"/models/"+model_id, 'KBaseFBA.FBAModel')
         elif exists(self.config["data_dir"]+"/models/"+model_id+".json"):
             return cobra.io.load_json_model(self.config["data_dir"]+"/models/"+model_id+".json") 
         elif exists(self.config["data_dir"]+"/models/"+model_id+".xml"):
