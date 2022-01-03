@@ -4,7 +4,7 @@ from os.path import exists
 import json
 import cobra
 #import cplex
-import cobrakbase
+#import cobrakbase
 import escher
 from escher import Builder
 from cobrakbase.core.kbase_object_factory import KBaseObjectFactory
@@ -37,8 +37,8 @@ class chenry_MetEngAPI:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = ""
-    GIT_COMMIT_HASH = ""
+    GIT_URL = "https://github.com/cshenry/chenry_MetEngAPI.git"
+    GIT_COMMIT_HASH = "b78ae37d4107dba9773cd210bc2c73c96bf077f9"
 
     #BEGIN_CLASS_HEADER
     def clear_context(self):
@@ -50,8 +50,8 @@ class chenry_MetEngAPI:
         self.clear_context()
         self.ctx = ctx
         self.kbase_api = None
-        if "token" in self.ctx:
-            self.kbase_api = cobrakbase.KBaseAPI(token=self.ctx['token'],config=self.config)
+        #if "token" in self.ctx:
+            #self.kbase_api = cobrakbase.KBaseAPI(token=self.ctx['token'],config=self.config)
     
     def get_media(self,media_id):
         if exists(self.config["data_dir"]+"/media/"+media_id):
