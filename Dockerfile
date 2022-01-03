@@ -38,6 +38,7 @@ RUN rm -rf /miniconda/lib/python3.6/site-packages/ruamel*
 # cobra version.
 RUN mkdir deps && cd deps && \
     pip install chemicals && \
+    pip install escher && \
     git clone --branch cobra-model https://github.com/Fxe/cobrakbase.git && \
     pip install cobrakbase/ && \
     git clone --branch main https://github.com/cshenry/ModelSEEDpy.git && \
