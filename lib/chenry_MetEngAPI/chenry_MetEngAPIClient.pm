@@ -1,6 +1,6 @@
 package chenry_MetEngAPI::chenry_MetEngAPIClient;
 
-use JSON::RPC::Client;
+use JSON::RPC::Legacy::Client;
 use POSIX;
 use strict;
 use Data::Dumper;
@@ -33,12 +33,12 @@ A KBase module: chenry_MetEngAPI
 sub new
 {
     my($class, $url, @args) = @_;
-    
+
 
     my $self = {
-	client => chenry_MetEngAPI::chenry_MetEngAPIClient::RpcClient->new,
-	url => $url,
-	headers => [],
+    client => chenry_MetEngAPI::chenry_MetEngAPIClient::RpcClient->new,
+    url => $url,
+    headers => [],
     };
 
     chomp($self->{hostname} = `hostname`);
@@ -51,32 +51,32 @@ sub new
     #
     if ($ENV{KBRPC_TAG})
     {
-	$self->{kbrpc_tag} = $ENV{KBRPC_TAG};
+    $self->{kbrpc_tag} = $ENV{KBRPC_TAG};
     }
     else
     {
-	my ($t, $us) = &$get_time();
-	$us = sprintf("%06d", $us);
-	my $ts = strftime("%Y-%m-%dT%H:%M:%S.${us}Z", gmtime $t);
-	$self->{kbrpc_tag} = "C:$0:$self->{hostname}:$$:$ts";
+    my ($t, $us) = &$get_time();
+    $us = sprintf("%06d", $us);
+    my $ts = strftime("%Y-%m-%dT%H:%M:%S.${us}Z", gmtime $t);
+    $self->{kbrpc_tag} = "C:$0:$self->{hostname}:$$:$ts";
     }
     push(@{$self->{headers}}, 'Kbrpc-Tag', $self->{kbrpc_tag});
 
     if ($ENV{KBRPC_METADATA})
     {
-	$self->{kbrpc_metadata} = $ENV{KBRPC_METADATA};
-	push(@{$self->{headers}}, 'Kbrpc-Metadata', $self->{kbrpc_metadata});
+    $self->{kbrpc_metadata} = $ENV{KBRPC_METADATA};
+    push(@{$self->{headers}}, 'Kbrpc-Metadata', $self->{kbrpc_metadata});
     }
 
     if ($ENV{KBRPC_ERROR_DEST})
     {
-	$self->{kbrpc_error_dest} = $ENV{KBRPC_ERROR_DEST};
-	push(@{$self->{headers}}, 'Kbrpc-Errordest', $self->{kbrpc_error_dest});
+    $self->{kbrpc_error_dest} = $ENV{KBRPC_ERROR_DEST};
+    push(@{$self->{headers}}, 'Kbrpc-Errordest', $self->{kbrpc_error_dest});
     }
 
 
-    my $ua = $self->{client}->ua;	 
-    my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);	 
+    my $ua = $self->{client}->ua;
+    my $timeout = $ENV{CDMI_TIMEOUT} || (30 * 60);
     $ua->timeout($timeout);
     bless $self, $class;
     #    $self->_validate_version();
@@ -100,11 +100,11 @@ sub new
 $params is a chenry_MetEngAPI.ModelOnlyInput
 $output is a chenry_MetEngAPI.GeneTable
 ModelOnlyInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
+    workspace has a value which is a string
+    model has a value which is a string
 GeneTable is a reference to a hash where the following keys are defined:
-	headings has a value which is a reference to a list where each element is a string
-	data has a value which is a reference to a list where each element is a reference to a list where each element is a string
+    headings has a value which is a reference to a list where each element is a string
+    data has a value which is a reference to a list where each element is a reference to a list where each element is a string
 
 </pre>
 
@@ -115,11 +115,11 @@ GeneTable is a reference to a hash where the following keys are defined:
 $params is a chenry_MetEngAPI.ModelOnlyInput
 $output is a chenry_MetEngAPI.GeneTable
 ModelOnlyInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
+    workspace has a value which is a string
+    model has a value which is a string
 GeneTable is a reference to a hash where the following keys are defined:
-	headings has a value which is a reference to a list where each element is a string
-	data has a value which is a reference to a list where each element is a reference to a list where each element is a string
+    headings has a value which is a reference to a list where each element is a string
+    data has a value which is a reference to a list where each element is a reference to a list where each element is a string
 
 
 =end text
@@ -140,44 +140,44 @@ Retrieve master gene table
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_gene_table_from_model (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function get_gene_table_from_model (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_gene_table_from_model:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_gene_table_from_model');
-	}
+        my $msg = "Invalid arguments passed to get_gene_table_from_model:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'get_gene_table_from_model');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.get_gene_table_from_model",
-	    params => \@args,
+        method => "chenry_MetEngAPI.get_gene_table_from_model",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'get_gene_table_from_model',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'get_gene_table_from_model',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_gene_table_from_model",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_gene_table_from_model',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'get_gene_table_from_model',
+                       );
     }
 }
- 
+
 
 
 =head2 get_model_data
@@ -194,11 +194,11 @@ Retrieve master gene table
 $params is a chenry_MetEngAPI.ModelOnlyInput
 $output is a chenry_MetEngAPI.GeneTable
 ModelOnlyInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
+    workspace has a value which is a string
+    model has a value which is a string
 GeneTable is a reference to a hash where the following keys are defined:
-	headings has a value which is a reference to a list where each element is a string
-	data has a value which is a reference to a list where each element is a reference to a list where each element is a string
+    headings has a value which is a reference to a list where each element is a string
+    data has a value which is a reference to a list where each element is a reference to a list where each element is a string
 
 </pre>
 
@@ -209,11 +209,11 @@ GeneTable is a reference to a hash where the following keys are defined:
 $params is a chenry_MetEngAPI.ModelOnlyInput
 $output is a chenry_MetEngAPI.GeneTable
 ModelOnlyInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
+    workspace has a value which is a string
+    model has a value which is a string
 GeneTable is a reference to a hash where the following keys are defined:
-	headings has a value which is a reference to a list where each element is a string
-	data has a value which is a reference to a list where each element is a reference to a list where each element is a string
+    headings has a value which is a reference to a list where each element is a string
+    data has a value which is a reference to a list where each element is a reference to a list where each element is a string
 
 
 =end text
@@ -234,44 +234,44 @@ Retrieve model data
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_model_data (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function get_model_data (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_model_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_model_data');
-	}
+        my $msg = "Invalid arguments passed to get_model_data:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'get_model_data');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.get_model_data",
-	    params => \@args,
+        method => "chenry_MetEngAPI.get_model_data",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'get_model_data',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'get_model_data',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_model_data",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_model_data',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'get_model_data',
+                       );
     }
 }
- 
+
 
 
 =head2 compute_biosynthesis_pathway
@@ -288,26 +288,26 @@ Retrieve model data
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.PathwayReactions
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 PathwayReactions is a reference to a hash where the following keys are defined:
-	pathway_reactions has a value which is a reference to a list where each element is a chenry_MetEngAPI.PathwayReaction
-	ATP_cost has a value which is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    pathway_reactions has a value which is a reference to a list where each element is a chenry_MetEngAPI.PathwayReaction
+    ATP_cost has a value which is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 PathwayReaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	intermediate has a value which is an int
-	flux has a value which is a float
-	max_flux has a value which is a float
-	min_flux has a value which is a float
+    id has a value which is a string
+    intermediate has a value which is an int
+    flux has a value which is a float
+    max_flux has a value which is a float
+    min_flux has a value which is a float
 
 </pre>
 
@@ -318,26 +318,26 @@ PathwayReaction is a reference to a hash where the following keys are defined:
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.PathwayReactions
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 PathwayReactions is a reference to a hash where the following keys are defined:
-	pathway_reactions has a value which is a reference to a list where each element is a chenry_MetEngAPI.PathwayReaction
-	ATP_cost has a value which is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    pathway_reactions has a value which is a reference to a list where each element is a chenry_MetEngAPI.PathwayReaction
+    ATP_cost has a value which is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 PathwayReaction is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	intermediate has a value which is an int
-	flux has a value which is a float
-	max_flux has a value which is a float
-	min_flux has a value which is a float
+    id has a value which is a string
+    intermediate has a value which is an int
+    flux has a value which is a float
+    max_flux has a value which is a float
+    min_flux has a value which is a float
 
 
 =end text
@@ -358,44 +358,44 @@ Compute the peripheral biosynthesis pathway for the selected target
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function compute_biosynthesis_pathway (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function compute_biosynthesis_pathway (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to compute_biosynthesis_pathway:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'compute_biosynthesis_pathway');
-	}
+        my $msg = "Invalid arguments passed to compute_biosynthesis_pathway:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'compute_biosynthesis_pathway');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.compute_biosynthesis_pathway",
-	    params => \@args,
+        method => "chenry_MetEngAPI.compute_biosynthesis_pathway",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'compute_biosynthesis_pathway',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'compute_biosynthesis_pathway',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method compute_biosynthesis_pathway",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'compute_biosynthesis_pathway',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'compute_biosynthesis_pathway',
+                       );
     }
 }
- 
+
 
 
 =head2 compute_competing_pathways
@@ -412,25 +412,25 @@ Compute the peripheral biosynthesis pathway for the selected target
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.CompetingReactions
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 CompetingReactions is a reference to a hash where the following keys are defined:
-	competing_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CompetingReactionData
+    competing_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CompetingReactionData
 CompetingReactionData is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	direction_for_competition has a value which is a string
-	intermediate has a value which is an int
-	flux has a value which is a float
-	max_flux has a value which is a float
-	min_flux has a value which is a float
+    id has a value which is a string
+    direction_for_competition has a value which is a string
+    intermediate has a value which is an int
+    flux has a value which is a float
+    max_flux has a value which is a float
+    min_flux has a value which is a float
 
 </pre>
 
@@ -441,25 +441,25 @@ CompetingReactionData is a reference to a hash where the following keys are defi
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.CompetingReactions
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 CompetingReactions is a reference to a hash where the following keys are defined:
-	competing_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CompetingReactionData
+    competing_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CompetingReactionData
 CompetingReactionData is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	direction_for_competition has a value which is a string
-	intermediate has a value which is an int
-	flux has a value which is a float
-	max_flux has a value which is a float
-	min_flux has a value which is a float
+    id has a value which is a string
+    direction_for_competition has a value which is a string
+    intermediate has a value which is an int
+    flux has a value which is a float
+    max_flux has a value which is a float
+    min_flux has a value which is a float
 
 
 =end text
@@ -480,44 +480,44 @@ Compute the peripheral biosynthesis pathway for the selected target
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function compute_competing_pathways (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function compute_competing_pathways (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to compute_competing_pathways:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'compute_competing_pathways');
-	}
+        my $msg = "Invalid arguments passed to compute_competing_pathways:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'compute_competing_pathways');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.compute_competing_pathways",
-	    params => \@args,
+        method => "chenry_MetEngAPI.compute_competing_pathways",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'compute_competing_pathways',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'compute_competing_pathways',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method compute_competing_pathways",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'compute_competing_pathways',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'compute_competing_pathways',
+                       );
     }
 }
- 
+
 
 
 =head2 compute_cofactor_consuming_pathways
@@ -534,24 +534,24 @@ Compute the peripheral biosynthesis pathway for the selected target
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.CofactorReactions
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 CofactorReactions is a reference to a hash where the following keys are defined:
-	cofactor_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CofactorReactionData
+    cofactor_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CofactorReactionData
 CofactorReactionData is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	direction_for_competition has a value which is a string
-	flux has a value which is a float
-	max_flux has a value which is a float
-	min_flux has a value which is a float
+    id has a value which is a string
+    direction_for_competition has a value which is a string
+    flux has a value which is a float
+    max_flux has a value which is a float
+    min_flux has a value which is a float
 
 </pre>
 
@@ -562,24 +562,24 @@ CofactorReactionData is a reference to a hash where the following keys are defin
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.CofactorReactions
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 CofactorReactions is a reference to a hash where the following keys are defined:
-	cofactor_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CofactorReactionData
+    cofactor_reactions has a value which is a reference to a hash where the key is a string and the value is a chenry_MetEngAPI.CofactorReactionData
 CofactorReactionData is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	direction_for_competition has a value which is a string
-	flux has a value which is a float
-	max_flux has a value which is a float
-	min_flux has a value which is a float
+    id has a value which is a string
+    direction_for_competition has a value which is a string
+    flux has a value which is a float
+    max_flux has a value which is a float
+    min_flux has a value which is a float
 
 
 =end text
@@ -600,44 +600,44 @@ Compute the peripheral biosynthesis pathway for the selected target
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function compute_cofactor_consuming_pathways (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function compute_cofactor_consuming_pathways (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to compute_cofactor_consuming_pathways:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'compute_cofactor_consuming_pathways');
-	}
+        my $msg = "Invalid arguments passed to compute_cofactor_consuming_pathways:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'compute_cofactor_consuming_pathways');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.compute_cofactor_consuming_pathways",
-	    params => \@args,
+        method => "chenry_MetEngAPI.compute_cofactor_consuming_pathways",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'compute_cofactor_consuming_pathways',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'compute_cofactor_consuming_pathways',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method compute_cofactor_consuming_pathways",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'compute_cofactor_consuming_pathways',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'compute_cofactor_consuming_pathways',
+                       );
     }
 }
- 
+
 
 
 =head2 systematic_target_search
@@ -654,24 +654,24 @@ Compute the peripheral biosynthesis pathway for the selected target
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.TargetModifications
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 TargetModifications is a reference to a hash where the following keys are defined:
-	ko_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-		0: a string
-		1: a float
+    ko_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+        0: a string
+        1: a float
 
-	induction_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-		0: a string
-		1: a float
+    induction_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+        0: a string
+        1: a float
 
 
 </pre>
@@ -683,24 +683,24 @@ TargetModifications is a reference to a hash where the following keys are define
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.TargetModifications
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 TargetModifications is a reference to a hash where the following keys are defined:
-	ko_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-		0: a string
-		1: a float
+    ko_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+        0: a string
+        1: a float
 
-	induction_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-		0: a string
-		1: a float
+    induction_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
+        0: a string
+        1: a float
 
 
 
@@ -722,44 +722,44 @@ Systematically try all KO and return predicted production from each KO
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function systematic_target_search (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function systematic_target_search (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to systematic_target_search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'systematic_target_search');
-	}
+        my $msg = "Invalid arguments passed to systematic_target_search:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'systematic_target_search');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.systematic_target_search",
-	    params => \@args,
+        method => "chenry_MetEngAPI.systematic_target_search",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'systematic_target_search',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'systematic_target_search',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method systematic_target_search",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'systematic_target_search',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'systematic_target_search',
+                       );
     }
 }
- 
+
 
 
 =head2 compute_flux
@@ -776,19 +776,19 @@ Systematically try all KO and return predicted production from each KO
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.FluxData
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 FluxData is a reference to a hash where the following keys are defined:
-	reaction_fluxes has a value which is a reference to a hash where the key is a string and the value is a float
-	metabolite_flux has a value which is a reference to a hash where the key is a string and the value is a float
+    reaction_fluxes has a value which is a reference to a hash where the key is a string and the value is a float
+    metabolite_flux has a value which is a reference to a hash where the key is a string and the value is a float
 
 </pre>
 
@@ -799,19 +799,19 @@ FluxData is a reference to a hash where the following keys are defined:
 $params is a chenry_MetEngAPI.ModelInput
 $output is a chenry_MetEngAPI.FluxData
 ModelInput is a reference to a hash where the following keys are defined:
-	workspace has a value which is a string
-	model has a value which is a string
-	carbon_source has a value which is a string
-	target has a value which is a string
-	base_media has a value which is a string
-	media_workspace has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a hash where the key is a string and the value is a float
-	inductions has a value which is a reference to a hash where the key is a string and the value is a float
-	cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
+    workspace has a value which is a string
+    model has a value which is a string
+    carbon_source has a value which is a string
+    target has a value which is a string
+    base_media has a value which is a string
+    media_workspace has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a hash where the key is a string and the value is a float
+    inductions has a value which is a reference to a hash where the key is a string and the value is a float
+    cofactor_stoichiometry has a value which is a reference to a hash where the key is a string and the value is a float
 FluxData is a reference to a hash where the following keys are defined:
-	reaction_fluxes has a value which is a reference to a hash where the key is a string and the value is a float
-	metabolite_flux has a value which is a reference to a hash where the key is a string and the value is a float
+    reaction_fluxes has a value which is a reference to a hash where the key is a string and the value is a float
+    metabolite_flux has a value which is a reference to a hash where the key is a string and the value is a float
 
 
 =end text
@@ -832,44 +832,44 @@ Compute the peripheral biosynthesis pathway for the selected target
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function compute_flux (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function compute_flux (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to compute_flux:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'compute_flux');
-	}
+        my $msg = "Invalid arguments passed to compute_flux:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'compute_flux');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.compute_flux",
-	    params => \@args,
+        method => "chenry_MetEngAPI.compute_flux",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'compute_flux',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'compute_flux',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method compute_flux",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'compute_flux',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'compute_flux',
+                       );
     }
 }
- 
+
 
 
 =head2 list_maps
@@ -886,17 +886,17 @@ Compute the peripheral biosynthesis pathway for the selected target
 $MapInput is a chenry_MetEngAPI.MapInput
 $output is a chenry_MetEngAPI.MapList
 MapInput is a reference to a hash where the following keys are defined:
-	model has a value which is a string
+    model has a value which is a string
 MapList is a reference to a hash where the following keys are defined:
-	maps has a value which is a reference to a list where each element is a chenry_MetEngAPI.MapData
+    maps has a value which is a reference to a list where each element is a chenry_MetEngAPI.MapData
 MapData is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	name has a value which is a string
-	reactions has a value which is a reference to a list where each element is a string
-	compounds has a value which is a reference to a list where each element is a string
-	genes has a value which is a reference to a list where each element is a string
-	total_reactions has a value which is an int
-	total_compounds has a value which is an int
+    id has a value which is a string
+    name has a value which is a string
+    reactions has a value which is a reference to a list where each element is a string
+    compounds has a value which is a reference to a list where each element is a string
+    genes has a value which is a reference to a list where each element is a string
+    total_reactions has a value which is an int
+    total_compounds has a value which is an int
 
 </pre>
 
@@ -907,17 +907,17 @@ MapData is a reference to a hash where the following keys are defined:
 $MapInput is a chenry_MetEngAPI.MapInput
 $output is a chenry_MetEngAPI.MapList
 MapInput is a reference to a hash where the following keys are defined:
-	model has a value which is a string
+    model has a value which is a string
 MapList is a reference to a hash where the following keys are defined:
-	maps has a value which is a reference to a list where each element is a chenry_MetEngAPI.MapData
+    maps has a value which is a reference to a list where each element is a chenry_MetEngAPI.MapData
 MapData is a reference to a hash where the following keys are defined:
-	id has a value which is a string
-	name has a value which is a string
-	reactions has a value which is a reference to a list where each element is a string
-	compounds has a value which is a reference to a list where each element is a string
-	genes has a value which is a reference to a list where each element is a string
-	total_reactions has a value which is an int
-	total_compounds has a value which is an int
+    id has a value which is a string
+    name has a value which is a string
+    reactions has a value which is a reference to a list where each element is a string
+    compounds has a value which is a reference to a list where each element is a string
+    genes has a value which is a reference to a list where each element is a string
+    total_reactions has a value which is an int
+    total_compounds has a value which is an int
 
 
 =end text
@@ -938,44 +938,44 @@ List maps available for viewing
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function list_maps (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function list_maps (received $n, expecting 1)");
     }
     {
-	my($MapInput) = @args;
+    my($MapInput) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($MapInput) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"MapInput\" (value was \"$MapInput\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to list_maps:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'list_maps');
-	}
+        my $msg = "Invalid arguments passed to list_maps:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'list_maps');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.list_maps",
-	    params => \@args,
+        method => "chenry_MetEngAPI.list_maps",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'list_maps',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'list_maps',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_maps",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'list_maps',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'list_maps',
+                       );
     }
 }
- 
+
 
 
 =head2 get_map
@@ -992,17 +992,17 @@ List maps available for viewing
 $params is a chenry_MetEngAPI.EscherInput
 $output is a chenry_MetEngAPI.EscherOutput
 EscherInput is a reference to a hash where the following keys are defined:
-	map_id has a value which is a string
-	reaction_flux has a value which is a reference to a hash where the key is a string and the value is a float
-	gene_expression has a value which is a reference to a hash where the key is a string and the value is a float
-	metabolite_values has a value which is a reference to a hash where the key is a string and the value is a float
-	model has a value which is a string
-	target has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a list where each element is a string
-	inductions has a value which is a reference to a list where each element is a string
+    map_id has a value which is a string
+    reaction_flux has a value which is a reference to a hash where the key is a string and the value is a float
+    gene_expression has a value which is a reference to a hash where the key is a string and the value is a float
+    metabolite_values has a value which is a reference to a hash where the key is a string and the value is a float
+    model has a value which is a string
+    target has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a list where each element is a string
+    inductions has a value which is a reference to a list where each element is a string
 EscherOutput is a reference to a hash where the following keys are defined:
-	html has a value which is a string
+    html has a value which is a string
 
 </pre>
 
@@ -1013,17 +1013,17 @@ EscherOutput is a reference to a hash where the following keys are defined:
 $params is a chenry_MetEngAPI.EscherInput
 $output is a chenry_MetEngAPI.EscherOutput
 EscherInput is a reference to a hash where the following keys are defined:
-	map_id has a value which is a string
-	reaction_flux has a value which is a reference to a hash where the key is a string and the value is a float
-	gene_expression has a value which is a reference to a hash where the key is a string and the value is a float
-	metabolite_values has a value which is a reference to a hash where the key is a string and the value is a float
-	model has a value which is a string
-	target has a value which is a string
-	kos has a value which is a reference to a list where each element is a string
-	kds has a value which is a reference to a list where each element is a string
-	inductions has a value which is a reference to a list where each element is a string
+    map_id has a value which is a string
+    reaction_flux has a value which is a reference to a hash where the key is a string and the value is a float
+    gene_expression has a value which is a reference to a hash where the key is a string and the value is a float
+    metabolite_values has a value which is a reference to a hash where the key is a string and the value is a float
+    model has a value which is a string
+    target has a value which is a string
+    kos has a value which is a reference to a list where each element is a string
+    kds has a value which is a reference to a list where each element is a string
+    inductions has a value which is a reference to a list where each element is a string
 EscherOutput is a reference to a hash where the following keys are defined:
-	html has a value which is a string
+    html has a value which is a string
 
 
 =end text
@@ -1044,45 +1044,45 @@ Get an escher map painted with input data rendered in HTML format
 
     if ((my $n = @args) != 1)
     {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function get_map (received $n, expecting 1)");
+    Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+                                   "Invalid argument count for function get_map (received $n, expecting 1)");
     }
     {
-	my($params) = @args;
+    my($params) = @args;
 
-	my @_bad_arguments;
+    my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to get_map:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'get_map');
-	}
+        my $msg = "Invalid arguments passed to get_map:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+        Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+                                   method_name => 'get_map');
+    }
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "chenry_MetEngAPI.get_map",
-	    params => \@args,
+        method => "chenry_MetEngAPI.get_map",
+        params => \@args,
     });
     if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'get_map',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
+    if ($result->is_error) {
+        Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+                           code => $result->content->{error}->{code},
+                           method_name => 'get_map',
+                           data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+                          );
+    } else {
+        return wantarray ? @{$result->result} : $result->result->[0];
+    }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_map",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'get_map',
-				       );
+                        status_line => $self->{client}->status_line,
+                        method_name => 'get_map',
+                       );
     }
 }
- 
-  
+
+
 sub status
 {
     my($self, @args) = @_;
@@ -1112,7 +1112,7 @@ sub status
                        );
     }
 }
-   
+
 
 sub version {
     my ($self) = @_;
@@ -1546,12 +1546,12 @@ cofactor_reactions has a value which is a reference to a hash where the key is a
 <pre>
 a reference to a hash where the following keys are defined:
 ko_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a string
-	1: a float
+    0: a string
+    1: a float
 
 induction_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a string
-	1: a float
+    0: a string
+    1: a float
 
 
 </pre>
@@ -1562,12 +1562,12 @@ induction_targets has a value which is a reference to a list where each element 
 
 a reference to a hash where the following keys are defined:
 ko_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a string
-	1: a float
+    0: a string
+    1: a float
 
 induction_targets has a value which is a reference to a list where each element is a reference to a list containing 2 items:
-	0: a string
-	1: a float
+    0: a string
+    1: a float
 
 
 
@@ -1804,13 +1804,13 @@ sub call {
 
 
     {
-	if ($uri =~ /\?/) {
-	    $result = $self->_get($uri);
-	}
-	else {
-	    Carp::croak "not hashref." unless (ref $obj eq 'HASH');
-	    $result = $self->_post($uri, $headers, $obj);
-	}
+    if ($uri =~ /\?/) {
+        $result = $self->_get($uri);
+    }
+    else {
+        Carp::croak "not hashref." unless (ref $obj eq 'HASH');
+        $result = $self->_post($uri, $headers, $obj);
+    }
 
     }
 
@@ -1855,8 +1855,8 @@ sub _post {
     }
     else {
         # $obj->{id} = $self->id if (defined $self->id);
-	# Assign a random number to the id if one hasn't been set
-	$obj->{id} = (defined $self->id) ? $self->id : substr(rand(),2);
+    # Assign a random number to the id if one hasn't been set
+    $obj->{id} = (defined $self->id) ? $self->id : substr(rand(),2);
     }
 
     my $content = $json->encode($obj);
@@ -1866,8 +1866,8 @@ sub _post {
         Content_Type   => $self->{content_type},
         Content        => $content,
         Accept         => 'application/json',
-	@$headers,
-	($self->{token} ? (Authorization => $self->{token}) : ()),
+    @$headers,
+    ($self->{token} ? (Authorization => $self->{token}) : ()),
     );
 }
 
